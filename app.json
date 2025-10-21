@@ -19,6 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
+      "googleServicesFile": "./assets/google-services.json",
+      "package": "thanni.tanky",
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -43,6 +45,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "350e3e66-f90e-4361-ac20-1f6007c5dd35"
+      }
     }
   }
 }

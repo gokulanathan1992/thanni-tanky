@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "835911518777",
+    "firebase_url": "https://tank-water-level-monitor-default-rtdb.firebaseio.com",
+    "project_id": "tank-water-level-monitor",
+    "storage_bucket": "tank-water-level-monitor.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835911518777:android:ae072b5866741997f01be8",
+        "android_client_info": {
+          "package_name": "thanni.tanky"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVVZJM8pZE2iTysRiz6dtmSQl12lq2ctA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

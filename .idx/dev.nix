@@ -6,7 +6,10 @@
   # Use https://search.nixos.org/packages to find packages
   packages = [ pkgs.nodejs_20 ];
   # Sets environment variables in the workspace
-  env = { EXPO_USE_FAST_RESOLVER = 1; };
+  env = {
+    EXPO_TOKEN = "J3RNP9XQ63tkU3I9SzznEK_ufV98RkbOh7FTPipA";
+    EXPO_USE_FAST_RESOLVER = 1;
+  };
   idx = {
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
