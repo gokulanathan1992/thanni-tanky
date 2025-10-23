@@ -1,5 +1,5 @@
-import { View } from "react-native";
-import Homepage from "./screens/homepage";
+import { View } from 'react-native';
+import Homepage from './screens/homepage';
 
 export default function Index() {
   return (

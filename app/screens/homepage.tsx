@@ -1,17 +1,24 @@
-import { onValue, ref } from "firebase/database";
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { database } from "../../firebase";
+import { onValue, ref } from 'firebase/database';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { database } from '../../firebase';
+import Colors from '../colors';
+import WaterTank from '../components/WaterTank';
 
 const styles = StyleSheet.create({
     container: {
-        alignItems: 'flex-start',
-        backgroundColor: 'gray',
+        alignItems: 'center',
+        backgroundColor: Colors.appBg,
         flex: 1,
         justifyContent: 'center',
         padding: 20,
         width: '100%',
     },
+    text: {
+        color: Colors.text,
+        fontSize: 20,
+        marginBottom: 10,
+    }
 });
 
 const Homepage = () => {
@@ -39,9 +46,9 @@ const Homepage = () => {
 
     return (
         <View style={styles.container} >
-            <Text>{`Motor Status: ${motorStatus ? 'ON' : 'OFF'}`}</Text>
-            <Text>{`Tank Water Level: ${waterLevel}`}</Text>
-            <Text>{`Motor Timer: ${motorTimer}`}</Text>
+            <Text style={styles.text}>{`Motor Status: ${motorStatus ? 'ON' : 'OFF'}`}</Text>
+            <Text style={styles.text}>{`Motor Timer: ${motorTimer}`}</Text>
+            <WaterTank waterLevel={waterLevel} />
         </View>
     );
 };
