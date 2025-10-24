@@ -7,7 +7,7 @@
   packages = [ pkgs.nodejs_20 ];
   # Sets environment variables in the workspace
   env = {
-    EXPO_TOKEN = "J3RNP9XQ63tkU3I9SzznEK_ufV98RkbOh7FTPipA";
+    EXPO_TOKEN = "SksZYFuKzrfRiyr-8hNB8IfQISbaTIyZAsF_cy8S";
     EXPO_USE_FAST_RESOLVER = 1;
   };
   idx = {

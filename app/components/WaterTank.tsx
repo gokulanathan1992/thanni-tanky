@@ -1,9 +1,14 @@
-import { Canvas, Circle, Group } from '@shopify/react-native-skia';
+import { Canvas, Group, Rect } from '@shopify/react-native-skia';
 import React from 'react';
 import { Animated, StyleSheet } from 'react-native';
 import Colors from '../colors';
 
 const styles = StyleSheet.create({
+  canvas: {
+    flex: 1,
+    height: 200,
+    width: 300,
+  },
   container: {
     width: 300,
     height: 200,
@@ -42,13 +47,13 @@ const WaterTank = ({ waterLevel = 0 }) => {
     }).start();
   }, [waterHeight, waterLevel]);
 
-  const waterStyle = {
-    backgroundColor: Colors.water,
-    height: waterHeight.interpolate({
-      inputRange: [0, 100],
-      outputRange: [0, 200],
-    }),
-  };
+  // const waterStyle = {
+  //   backgroundColor: Colors.water,
+  //   height: waterHeight.interpolate({
+  //     inputRange: [0, 100],
+  //     outputRange: [0, 200],
+  //   }),
+  // };
 
   return (
     // <View style={styles.container}>
@@ -57,9 +62,9 @@ const WaterTank = ({ waterLevel = 0 }) => {
     //     <Text style={styles.text}>{`${waterLevel}%`}</Text>
     //   </View>
     // </View>
-    <Canvas style={{ flex: 1, width: 300, height: 200 }}>
+    <Canvas style={styles.canvas}>
       <Group>
-        <Circle cx={100} cy={100} r={50} color="lightblue" />
+        <Rect x={100} y={100} width={50} height={50} color={Colors.water} />
       </Group>
     </Canvas>
   );
