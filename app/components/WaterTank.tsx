@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
   percentText: {
     fontSize: 32,
     fontWeight: 'bold',
+    opacity: 0.75,
   },
 });
 
@@ -64,31 +65,50 @@ const WaterTank = ({ waterLevel = 0 }) => {
   const waterHeight = (animatedLevel / 100) * (TANK_HEIGHT - 2 * TANK_PADDING);
   const waterY = TANK_HEIGHT - TANK_PADDING - waterHeight;
 
-  // Create wave path
+  // Create simple wave path (will be clipped by tank border)
   const createWavePath = () => {
     const path = Skia.Path.Make();
-    const waveHeight = 8;
-    const waveWidth = 40;
+    const waveHeight =  waterLevel === 100 ? 0 : 4;
+    const waveWidth = 10;
     const startY = waterY;
 
-    path.moveTo(TANK_PADDING, startY);
+    // Start from left edge
+    path.moveTo(0, startY);
 
-    // Draw wave curves
-    for (let x = TANK_PADDING; x <= TANK_WIDTH - TANK_PADDING; x += waveWidth) {
+    // Draw wave curves across the full width
+    for (let x = 0; x <= TANK_WIDTH; x += waveWidth) {
       const offsetRadians = ((waveOffset + x) * Math.PI) / 180;
       const y = startY + Math.sin(offsetRadians) * waveHeight;
       path.lineTo(x, y);
     }
 
-    // Complete the path to fill the water area
-    path.lineTo(TANK_WIDTH - TANK_PADDING, TANK_HEIGHT - TANK_PADDING);
-    path.lineTo(TANK_PADDING, TANK_HEIGHT - TANK_PADDING);
+    // Ensure we end exactly at the right edge with proper wave calculation
+    const finalOffsetRadians = ((waveOffset + TANK_WIDTH) * Math.PI) / 180;
+    const finalY = startY + Math.sin(finalOffsetRadians) * waveHeight;
+    path.lineTo(TANK_WIDTH, finalY);
+
+    // Complete the rectangle to fill below the wave
+    path.lineTo(TANK_WIDTH, TANK_HEIGHT);
+    path.lineTo(0, TANK_HEIGHT);
     path.close();
 
     return path;
   };
 
   const wavePath = createWavePath();
+
+  // Create clip path for tank boundaries with rounded corners
+  const clipPath = Skia.Path.Make();
+  clipPath.addRRect({
+    rect: {
+      x: TANK_PADDING + TANK_BORDER_WIDTH / 2,
+      y: TANK_PADDING + TANK_BORDER_WIDTH / 2,
+      width: TANK_WIDTH - 2 * TANK_PADDING - TANK_BORDER_WIDTH,
+      height: TANK_HEIGHT - 2 * TANK_PADDING - TANK_BORDER_WIDTH,
+    },
+    rx: 10,
+    ry: 10,
+  });
 
   // Font handling for text
   const percentText = `${Math.round(animatedLevel)}%`;
@@ -124,25 +144,25 @@ const WaterTank = ({ waterLevel = 0 }) => {
             r={10}
             style="stroke"
             strokeWidth={TANK_BORDER_WIDTH}
-            color={Colors.tankBorder || '#2196F3'}
+            color={Colors.tankBorder}
           />
 
-          {/* Water fill with wave */}
-          {animatedLevel > 0 && (
-            <Group>
-              <Path
-                path={wavePath}
-                color={Colors.water || '#4FC3F7'}
-                opacity={0.8}
-              />
-              {/* Second layer for depth effect */}
-              <Path
-                path={wavePath}
-                color={Colors.water || '#4FC3F7'}
-                opacity={0.4}
-              />
-            </Group>
-          )}
+        {/* Water fill with wave - clipped to tank boundaries */}
+        {animatedLevel > 0 && (
+          <Group clip={clipPath}>
+            <Path
+              path={wavePath}
+              color={Colors.water}
+              opacity={0.8}
+            />
+            {/* Second layer for depth effect */}
+            <Path
+              path={wavePath}
+              color={Colors.water}
+              opacity={0.4}
+            />
+          </Group>
+        )}
 
           {/* Percentage text - only on native platforms with font */}
           {font && (
@@ -151,7 +171,7 @@ const WaterTank = ({ waterLevel = 0 }) => {
               y={textY}
               text={percentText}
               font={font}
-              color={animatedLevel > 50 ? '#FFFFFF' : (Colors.text || '#000000')}
+              color={Colors.textInWater}
             />
           )}
         </Group>
@@ -164,7 +184,7 @@ const WaterTank = ({ waterLevel = 0 }) => {
             style={[
               styles.percentText,
               {
-                color: animatedLevel > 50 ? '#FFFFFF' : (Colors.text || '#000000'),
+                color: Colors.textInWater,
               },
             ]}
           >
