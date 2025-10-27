@@ -27,11 +27,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     pointerEvents: 'none',
+    zIndex: 100,
+  },
+  textOverlay2: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    pointerEvents: 'none',
+    zIndex: 1000,
   },
   percentText: {
     fontSize: 32,
     fontWeight: 'bold',
-    opacity: 0.75,
   },
 });
 
@@ -95,8 +106,6 @@ const WaterTank = ({ waterLevel = 0 }) => {
     return path;
   };
 
-  const wavePath = createWavePath();
-
   // Create clip path for tank boundaries with rounded corners
   const clipPath = Skia.Path.Make();
   clipPath.addRRect({
@@ -109,6 +118,36 @@ const WaterTank = ({ waterLevel = 0 }) => {
     rx: 10,
     ry: 10,
   });
+
+  // Calculate wave offset at center for web/Android text clipping
+  const waveHeightValue = waterLevel === 100 ? 0 : 4;
+  const centerWaveOffset = ((waveOffset + TANK_WIDTH / 2) * Math.PI) / 180;
+  const centerWaveY = waterY + Math.sin(centerWaveOffset) * waveHeightValue;
+
+  // Generate SVG path for wave clipping on web/Android
+  const generateWaveClipPath = () => {
+    const waveWidth = 10;
+    let pathData = `M 0 ${waterY}`;
+    
+    // Draw wave curves
+    for (let x = 0; x <= TANK_WIDTH; x += waveWidth) {
+      const offsetRadians = ((waveOffset + x) * Math.PI) / 180;
+      const y = waterY + Math.sin(offsetRadians) * waveHeightValue;
+      pathData += ` L ${x} ${y}`;
+    }
+    
+    // Ensure we end at the right edge
+    const finalOffsetRadians = ((waveOffset + TANK_WIDTH) * Math.PI) / 180;
+    const finalY = waterY + Math.sin(finalOffsetRadians) * waveHeightValue;
+    pathData += ` L ${TANK_WIDTH} ${finalY}`;
+    
+    // Complete the path to bottom
+    pathData += ` L ${TANK_WIDTH} ${TANK_HEIGHT} L 0 ${TANK_HEIGHT} Z`;
+    
+    return pathData;
+  };
+
+  const waveClipPath = generateWaveClipPath();
 
   // Font handling for text
   const percentText = `${Math.round(animatedLevel)}%`;
@@ -147,33 +186,43 @@ const WaterTank = ({ waterLevel = 0 }) => {
             color={Colors.tankBorder}
           />
 
+        {/* Percentage text (base layer) - only on iOS with font */}
+        {font && (
+          <SkiaText
+            x={textX}
+            y={textY}
+            text={percentText}
+            font={font}
+            color={Colors.textInWater}
+          />
+        )}
+
         {/* Water fill with wave - clipped to tank boundaries */}
         {animatedLevel > 0 && (
           <Group clip={clipPath}>
             <Path
-              path={wavePath}
+              path={createWavePath()}
               color={Colors.water}
               opacity={0.8}
             />
             {/* Second layer for depth effect */}
             <Path
-              path={wavePath}
+              path={createWavePath()}
               color={Colors.water}
               opacity={0.4}
             />
+            {/* Water level text in dark blue - clipped by wave path, only on iOS */}
+            {font && (
+              <SkiaText
+                x={textX}
+                y={textY}
+                text={percentText}
+                font={font}
+                color={Colors.waterLight}
+              />
+            )}
           </Group>
         )}
-
-          {/* Percentage text - only on native platforms with font */}
-          {font && (
-            <SkiaText
-              x={textX}
-              y={textY}
-              text={percentText}
-              font={font}
-              color={Colors.textInWater}
-            />
-          )}
         </Group>
       </Canvas>
 
@@ -190,6 +239,77 @@ const WaterTank = ({ waterLevel = 0 }) => {
           >
             {percentText}
           </Text>
+        </View>
+      )}
+      {/* Text overlay for web - clipped by wave animation with SVG */}
+      {Platform.OS === 'web' && (
+        <>
+          {/* SVG clip path definition */}
+          <svg width="0" height="0" style={{ position: 'absolute' }}>
+            <defs>
+              <clipPath id="waveClip" clipPathUnits="userSpaceOnUse">
+                <path d={waveClipPath} />
+              </clipPath>
+            </defs>
+          </svg>
+          
+          <View 
+            style={[
+              styles.textOverlay2,
+              {
+                clipPath: 'url(#waveClip)',
+                WebkitClipPath: 'url(#waveClip)',
+              } as any
+            ]}
+          >
+            <Text
+              style={[
+                styles.percentText,
+                {
+                  color: Colors.waterLight,
+                },
+              ]}
+            >
+              {percentText}
+            </Text>
+          </View>
+        </>
+      )}
+
+      {/* Text overlay for Android - clipped by straight line (SVG not supported) */}
+      {Platform.OS === 'android' && (
+        <View style={styles.textOverlay2}>
+          <View
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              top: animatedLevel > 0 ? centerWaveY : TANK_HEIGHT,
+              overflow: 'hidden',
+            }}
+          >
+            <View
+              style={{
+                position: 'absolute',
+                top: -centerWaveY + TANK_HEIGHT / 2 - fontSize / 2 - 5,
+                left: 0,
+                right: 0,
+                alignItems: 'center',
+              }}
+            >
+              <Text
+                style={[
+                  styles.percentText,
+                  {
+                    color: Colors.waterLight,
+                  },
+                ]}
+              >
+                {percentText}
+              </Text>
+            </View>
+          </View>
         </View>
       )}
     </View>
