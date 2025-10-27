@@ -117,9 +117,9 @@ const WaterTank = ({ waterLevel = 0 }) => {
   const fontSize = 32;
   const textY = TANK_HEIGHT / 2 + fontSize / 3;
 
-  // Only use matchFont on native platforms
-  if (Platform.OS !== 'web') {
-    const fontFamily = Platform.select({ ios: 'Helvetica', android: 'Roboto', default: 'Arial' });
+  // Only use matchFont on iOS (Android will use Text overlay)
+  if (Platform.OS === 'ios') {
+    const fontFamily = 'Helvetica';
     try {
       font = matchFont({ fontFamily, fontSize, fontWeight: 'bold' });
       if (font) {
@@ -177,8 +177,8 @@ const WaterTank = ({ waterLevel = 0 }) => {
         </Group>
       </Canvas>
 
-      {/* Text overlay for web (since Skia text doesn't work on web) */}
-      {Platform.OS === 'web' && (
+      {/* Text overlay for web and Android (fallback for Skia text issues) */}
+      {(Platform.OS === 'web' || Platform.OS === 'android') && (
         <View style={styles.textOverlay}>
           <Text
             style={[

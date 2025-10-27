@@ -47,7 +47,7 @@ const Homepage = () => {
     return (
         <View style={styles.container} >
             <Text style={styles.text}>{`Motor Status: ${motorStatus ? 'ON' : 'OFF'}`}</Text>
-            <Text style={styles.text}>{`Motor Timer: ${motorTimer}`}</Text>
+            <Text style={styles.text}>{`Motor Timer: ${motorTimer} min${motorTimer > 1 ? 's' : ''}`}</Text>
             <WaterTank waterLevel={waterLevel} />
         </View>
     );
