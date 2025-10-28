@@ -1,4 +1,4 @@
-import { Canvas, Group, Path, RoundedRect, Skia, Text as SkiaText, matchFont } from '@shopify/react-native-skia';
+import { Canvas, Group, LinearGradient, Path, RoundedRect, Skia, Text as SkiaText, matchFont, vec } from '@shopify/react-native-skia';
 import React from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import Colors from '../colors';
@@ -12,6 +12,9 @@ const styles = StyleSheet.create({
   canvas: {
     height: TANK_HEIGHT,
     width: TANK_WIDTH,
+    backgroundColor: 'transparent',
+    position: 'relative',
+    zIndex: 10,
   },
   container: {
     height: TANK_HEIGHT,
@@ -172,6 +175,17 @@ const WaterTank = ({ waterLevel = 0 }) => {
 
   return (
     <View style={styles.container}>
+      {/* SVG clip path definition for web text clipping */}
+      {Platform.OS === 'web' && (
+        <svg width="0" height="0" style={{ position: 'absolute' }}>
+          <defs>
+            <clipPath id="waveClipGradient" clipPathUnits="userSpaceOnUse">
+              <path d={waveClipPath} />
+            </clipPath>
+          </defs>
+        </svg>
+      )}
+      
       <Canvas style={styles.canvas}>
         <Group>
           {/* Tank border */}
@@ -197,22 +211,18 @@ const WaterTank = ({ waterLevel = 0 }) => {
           />
         )}
 
-        {/* Water fill with wave - clipped to tank boundaries */}
-        {animatedLevel > 0 && (
+        {/* Water fill with gradient - clipped to tank boundaries */}
+        {animatedLevel > 0 && Platform.OS !== 'android' && (
           <Group clip={clipPath}>
-            <Path
-              path={createWavePath()}
-              color={Colors.water}
-              opacity={0.8}
-            />
-            {/* Second layer for depth effect */}
-            <Path
-              path={createWavePath()}
-              color={Colors.water}
-              opacity={0.4}
-            />
-            {/* Water level text in dark blue - clipped by wave path, only on iOS */}
-            {font && (
+            <Path path={createWavePath()}>
+              <LinearGradient
+                start={vec(0, TANK_HEIGHT)}
+                end={vec(0, waterY)}
+                colors={[Colors.water, Colors.waterLight]}
+              />
+            </Path>
+            {/* Water level text in light color - clipped by wave path (iOS only) */}
+            {Platform.OS === 'ios' && font && (
               <SkiaText
                 x={textX}
                 y={textY}
@@ -233,7 +243,7 @@ const WaterTank = ({ waterLevel = 0 }) => {
             style={[
               styles.percentText,
               {
-                color: Colors.textInWater,
+                color: Colors.textAboveWater,
               },
             ]}
           >
@@ -243,37 +253,26 @@ const WaterTank = ({ waterLevel = 0 }) => {
       )}
       {/* Text overlay for web - clipped by wave animation with SVG */}
       {Platform.OS === 'web' && (
-        <>
-          {/* SVG clip path definition */}
-          <svg width="0" height="0" style={{ position: 'absolute' }}>
-            <defs>
-              <clipPath id="waveClip" clipPathUnits="userSpaceOnUse">
-                <path d={waveClipPath} />
-              </clipPath>
-            </defs>
-          </svg>
-          
-          <View 
+        <View 
+          style={[
+            styles.textOverlay2,
+            {
+              clipPath: 'url(#waveClipGradient)',
+              WebkitClipPath: 'url(#waveClipGradient)',
+            } as any
+          ]}
+        >
+          <Text
             style={[
-              styles.textOverlay2,
+              styles.percentText,
               {
-                clipPath: 'url(#waveClip)',
-                WebkitClipPath: 'url(#waveClip)',
-              } as any
+                color: Colors.textInWater,
+              },
             ]}
           >
-            <Text
-              style={[
-                styles.percentText,
-                {
-                  color: Colors.waterLight,
-                },
-              ]}
-            >
-              {percentText}
-            </Text>
-          </View>
-        </>
+            {percentText}
+          </Text>
+        </View>
       )}
 
       {/* Text overlay for Android - clipped by straight line (SVG not supported) */}
@@ -302,7 +301,7 @@ const WaterTank = ({ waterLevel = 0 }) => {
                 style={[
                   styles.percentText,
                   {
-                    color: Colors.waterLight,
+                    color: Colors.textInWater,
                   },
                 ]}
               >
