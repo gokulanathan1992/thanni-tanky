@@ -1,6 +1,6 @@
 import { onValue, ref } from 'firebase/database';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Switch, Text, View } from 'react-native';
 import { database } from '../../firebase';
 import Colors from '../colors';
 import WaterTank from '../components/WaterTank';
@@ -18,6 +18,12 @@ const styles = StyleSheet.create({
         color: Colors.text,
         fontSize: 20,
         marginBottom: 10,
+    },
+    motorStatusRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+        gap: 10,
     }
 });
 
@@ -46,7 +52,16 @@ const Homepage = () => {
 
     return (
         <View style={styles.container} >
-            <Text style={styles.text}>{`Motor Status: ${motorStatus ? 'ON' : 'OFF'}`}</Text>
+            <View style={styles.motorStatusRow}>
+                <Text style={styles.text}>Motor Status:</Text>
+                <Switch
+                    value={motorStatus}
+                    onValueChange={() => {}}
+                    disabled={true}
+                    trackColor={{ false: '#767577', true: Colors.water }}
+                    thumbColor={motorStatus ? Colors.waterLight : '#f4f3f4'}
+                />
+            </View>
             <Text style={styles.text}>{`Motor Timer: ${motorTimer} min${motorTimer > 1 ? 's' : ''}`}</Text>
             <WaterTank waterLevel={waterLevel} />
         </View>

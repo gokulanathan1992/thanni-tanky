@@ -211,9 +211,9 @@ const WaterTank = ({ waterLevel = 0 }) => {
           />
         )}
 
-        {/* Water fill with gradient - clipped to tank boundaries */}
-        {animatedLevel > 0 && Platform.OS !== 'android' && (
-          <Group clip={clipPath}>
+        {/* Water fill with gradient - clipped to tank boundaries (all platforms) */}
+        {animatedLevel > 0 && (
+          <Group clip={clipPath} opacity={0.8}>
             <Path path={createWavePath()}>
               <LinearGradient
                 start={vec(0, TANK_HEIGHT)}
