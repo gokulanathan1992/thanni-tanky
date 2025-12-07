@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 import { database } from '../../firebase';
 import Colors from '../colors';
+import CircularTimer from '../components/CircularTimer';
 import WaterTank from '../components/WaterTank';
 
 const styles = StyleSheet.create({
@@ -14,16 +15,26 @@ const styles = StyleSheet.create({
         padding: 20,
         width: '100%',
     },
+    motorStatusRow: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        gap: 10,
+        marginBottom: 10,
+    },
     text: {
         color: Colors.text,
         fontSize: 20,
         marginBottom: 10,
     },
-    motorStatusRow: {
-        flexDirection: 'row',
+    timerSection: {
         alignItems: 'center',
+        marginBottom: 20,
+    },
+    timerLabel: {
+        color: Colors.text,
+        fontSize: 18,
+        fontWeight: '600',
         marginBottom: 10,
-        gap: 10,
     }
 });
 
@@ -52,8 +63,9 @@ const Homepage = () => {
 
     return (
         <View style={styles.container} >
+            <WaterTank waterLevel={waterLevel} />
             <View style={styles.motorStatusRow}>
-                <Text style={styles.text}>Motor Status:</Text>
+                <Text style={styles.text}>{'Motor Status'}</Text>
                 <Switch
                     value={motorStatus}
                     onValueChange={() => {}}
@@ -62,8 +74,10 @@ const Homepage = () => {
                     thumbColor={motorStatus ? Colors.waterLight : '#f4f3f4'}
                 />
             </View>
-            <Text style={styles.text}>{`Motor Timer: ${motorTimer} min${motorTimer > 1 ? 's' : ''}`}</Text>
-            <WaterTank waterLevel={waterLevel} />
+            <View style={styles.timerSection}>
+                <CircularTimer timer={motorTimer} />
+                <Text style={styles.timerLabel}>{'Motor Timer'}</Text>
+            </View>
         </View>
     );
 };
