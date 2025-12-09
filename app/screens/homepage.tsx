@@ -74,10 +74,12 @@ const Homepage = () => {
                     thumbColor={motorStatus ? Colors.waterLight : '#f4f3f4'}
                 />
             </View>
-            <View style={styles.timerSection}>
-                <CircularTimer timer={motorTimer} />
-                <Text style={styles.timerLabel}>{'Motor Timer'}</Text>
-            </View>
+            {motorStatus && (
+                <View style={styles.timerSection}>
+                    <CircularTimer timer={motorTimer} />
+                    <Text style={styles.timerLabel}>{'Motor Timer'}</Text>
+                </View>
+            )}
         </View>
     );
 };
