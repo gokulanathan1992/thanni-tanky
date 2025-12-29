@@ -25,11 +25,11 @@ const styles = StyleSheet.create({
     statusRow: {
         alignItems: 'center',
         flexDirection: 'row',
-        gap: 8,
+        gap: 4,
     },
     text: {
         color: Colors.text,
-        fontSize: 18,
+        fontSize: 14,
     },
     timerSection: {
         alignItems: 'center',
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     },
     timerLabel: {
         color: Colors.text,
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: '600',
         marginBottom: 8,
         marginTop: 8,
@@ -73,6 +73,7 @@ const Homepage = () => {
 
     return (
         <View style={styles.container} >
+            <WaterTank waterLevel={waterLevel} />
             <View style={styles.row}>
                 <View style={styles.statusRow}>
                     <Text style={styles.text}>{'Online Status'}</Text>
@@ -95,10 +96,7 @@ const Homepage = () => {
                     />
                 </View>
             </View>
-            <WaterTank waterLevel={waterLevel} />
-            <View style={styles.row}>
-                <Text style={styles.text}>{`Distance between sensor and water surface: ${distance} cm`}</Text>
-            </View>
+            <Text style={styles.text}>{`Distance between sensor and water surface: ${distance} cm`}</Text>
             {motorStatus && (
                 <View style={styles.timerSection}>
                     <CircularTimer timer={motorTimer} />
