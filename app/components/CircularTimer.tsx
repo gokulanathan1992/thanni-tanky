@@ -10,11 +10,13 @@ const MAX_TIMER = 20; // Maximum timer in minutes
 
 const styles = StyleSheet.create({
   container: {
-    width: TIMER_SIZE,
-    height: TIMER_SIZE,
-    position: 'relative',
     alignItems: 'center',
+    height: TIMER_SIZE,
     justifyContent: 'center',
+    marginBottom: 8,
+    marginTop: 40,
+    position: 'relative',
+    width: TIMER_SIZE,
   },
   canvas: {
     width: TIMER_SIZE,

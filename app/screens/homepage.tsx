@@ -15,16 +15,21 @@ const styles = StyleSheet.create({
         padding: 20,
         width: '100%',
     },
-    motorStatusRow: {
+    row: {
         alignItems: 'center',
         flexDirection: 'row',
-        gap: 10,
-        marginBottom: 10,
+        gap: 20,
+        marginBottom: 12,
+        marginTop: 12,
+    },
+    statusRow: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        gap: 8,
     },
     text: {
         color: Colors.text,
-        fontSize: 20,
-        marginBottom: 10,
+        fontSize: 18,
     },
     timerSection: {
         alignItems: 'center',
@@ -34,26 +39,31 @@ const styles = StyleSheet.create({
         color: Colors.text,
         fontSize: 18,
         fontWeight: '600',
-        marginBottom: 10,
+        marginBottom: 8,
+        marginTop: 8,
     }
 });
 
 const Homepage = () => {
     const [state, setState] = React.useState({
+        distance: 0,
+        onlineStatus: false,
         motorStatus: false,
-        waterLevel: 0,
         motorTimer: 0,
+        waterLevel: 0,
     });
-    const { motorStatus, waterLevel, motorTimer } = state;
+    const { distance, onlineStatus, motorStatus, motorTimer, waterLevel } = state;
 
     React.useEffect(() => {
         const dbRef = ref(database);
         const unsubscribe = onValue(dbRef, (snapshot) => {
             const data = snapshot.val();
             setState({
+                distance: data?.distance,
+                onlineStatus: data?.onlineStatus,
                 motorStatus: data?.isMotorOn,
-                waterLevel: data?.waterLevel,
                 motorTimer: data?.motorTimer,
+                waterLevel: data?.waterLevel,
             });
         });
 
@@ -63,16 +73,31 @@ const Homepage = () => {
 
     return (
         <View style={styles.container} >
+            <View style={styles.row}>
+                <View style={styles.statusRow}>
+                    <Text style={styles.text}>{'Online Status'}</Text>
+                    <Switch
+                        value={motorStatus}
+                        onValueChange={() => {}}
+                        disabled={true}
+                        trackColor={{ false: Colors.offline, true: Colors.online }}
+                        thumbColor={onlineStatus ? Colors.waterLight : '#f4f3f4'}
+                    />
+                </View>
+                <View style={styles.statusRow}>
+                    <Text style={styles.text}>{'Motor Status'}</Text>
+                    <Switch
+                        value={motorStatus}
+                        onValueChange={() => {}}
+                        disabled={true}
+                        trackColor={{ false: '#767577', true: Colors.water }}
+                        thumbColor={motorStatus ? Colors.waterLight : '#f4f3f4'}
+                    />
+                </View>
+            </View>
             <WaterTank waterLevel={waterLevel} />
-            <View style={styles.motorStatusRow}>
-                <Text style={styles.text}>{'Motor Status'}</Text>
-                <Switch
-                    value={motorStatus}
-                    onValueChange={() => {}}
-                    disabled={true}
-                    trackColor={{ false: '#767577', true: Colors.water }}
-                    thumbColor={motorStatus ? Colors.waterLight : '#f4f3f4'}
-                />
+            <View style={styles.row}>
+                <Text style={styles.text}>{`Distance between sensor and water surface: ${distance} cm`}</Text>
             </View>
             {motorStatus && (
                 <View style={styles.timerSection}>
