@@ -19,8 +19,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         gap: 20,
-        marginBottom: 12,
-        marginTop: 12,
+        marginBottom: 8,
+        marginTop: 8,
     },
     statusRow: {
         alignItems: 'center',
