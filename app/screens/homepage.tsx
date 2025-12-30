@@ -54,21 +54,57 @@ const Homepage = () => {
     });
     const { distance, onlineStatus, motorStatus, motorTimer, waterLevel } = state;
 
+    // Track previous value and timeout for heartbeat detection
+    const lastHeartbeatValueRef = React.useRef<boolean | null>(null);
+    const heartbeatTimeoutRef = React.useRef<number | null>(null);
+
     React.useEffect(() => {
         const dbRef = ref(database);
         const unsubscribe = onValue(dbRef, (snapshot) => {
             const data = snapshot.val();
-            setState({
+            const currentHeartbeat = data?.onlineStatus;
+
+            // Check if the value has toggled (changed from previous value)
+            const hasToggled = lastHeartbeatValueRef.current !== null && 
+                              lastHeartbeatValueRef.current !== currentHeartbeat;
+
+            // Update the last value
+            lastHeartbeatValueRef.current = currentHeartbeat;
+
+            // Update other fields
+            setState((prevState) => ({
                 distance: data?.distance,
-                onlineStatus: data?.onlineStatus,
+                onlineStatus: hasToggled ? true : prevState.onlineStatus, // Set true only on toggle
                 motorStatus: data?.isMotorOn,
                 motorTimer: data?.motorTimer,
                 waterLevel: data?.waterLevel,
-            });
+            }));
+
+            // If there's a toggle, reset the timeout
+            if (hasToggled) {
+                // Clear existing timeout
+                if (heartbeatTimeoutRef.current) {
+                    clearTimeout(heartbeatTimeoutRef.current);
+                }
+
+                // Set new timeout - if no toggle for 5 seconds, mark as offline
+                heartbeatTimeoutRef.current = setTimeout(() => {
+                    setState((prevState) => ({
+                        ...prevState,
+                        onlineStatus: false,
+                    }));
+                    heartbeatTimeoutRef.current = null;
+                }, 5000);
+            }
         });
 
-        // Cleanup subscription on unmount
-        return () => unsubscribe();
+        // Cleanup subscription and timeout on unmount
+        return () => {
+            unsubscribe();
+            if (heartbeatTimeoutRef.current) {
+                clearTimeout(heartbeatTimeoutRef.current);
+            }
+        };
     }, []);
 
     return (
@@ -78,7 +114,7 @@ const Homepage = () => {
                 <View style={styles.statusRow}>
                     <Text style={styles.text}>{'Online Status'}</Text>
                     <Switch
-                        value={motorStatus}
+                        value={onlineStatus}
                         onValueChange={() => {}}
                         disabled={true}
                         trackColor={{ false: Colors.offline, true: Colors.online }}
