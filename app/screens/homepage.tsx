@@ -11,9 +11,33 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: Colors.appBg,
         flex: 1,
+        width: '100%',
+    },
+    content: {
+        alignItems: 'center',
+        flex: 1,
         justifyContent: 'center',
         padding: 20,
         width: '100%',
+    },
+    footer: {
+        backgroundColor: Colors.appBg,
+        borderTopColor: Colors.tankBorder,
+        borderTopWidth: 1,
+        paddingBottom: 20,
+        paddingTop: 16,
+        width: '100%',
+    },
+    noteContainer: {
+        alignItems: 'flex-start',
+        flexDirection: 'column',
+        gap: 8,
+        paddingHorizontal: 20,
+    },
+    noteItem: {
+        alignItems: 'flex-start',
+        flexDirection: 'row',
+        gap: 8,
     },
     row: {
         alignItems: 'center',
@@ -30,6 +54,11 @@ const styles = StyleSheet.create({
     text: {
         color: Colors.text,
         fontSize: 14,
+    },
+    textBold: {
+        color: Colors.text,
+        fontSize: 14,
+        fontWeight: '600',
     },
     timerSection: {
         alignItems: 'center',
@@ -87,14 +116,14 @@ const Homepage = () => {
                     clearTimeout(heartbeatTimeoutRef.current);
                 }
 
-                // Set new timeout - if no toggle for 5 seconds, mark as offline
+                // Set new timeout - if no toggle for 10 seconds, mark as offline
                 heartbeatTimeoutRef.current = setTimeout(() => {
                     setState((prevState) => ({
                         ...prevState,
                         onlineStatus: false,
                     }));
                     heartbeatTimeoutRef.current = null;
-                }, 5000);
+                }, 10000);
             }
         });
 
@@ -109,36 +138,51 @@ const Homepage = () => {
 
     return (
         <View style={styles.container} >
-            <WaterTank waterLevel={waterLevel} />
-            <View style={styles.row}>
-                <View style={styles.statusRow}>
-                    <Text style={styles.text}>{'Online Status'}</Text>
-                    <Switch
-                        value={onlineStatus}
-                        onValueChange={() => {}}
-                        disabled={true}
-                        trackColor={{ false: Colors.offline, true: Colors.online }}
-                        thumbColor={onlineStatus ? Colors.waterLight : '#f4f3f4'}
-                    />
+            <View style={styles.content}>
+                <WaterTank waterLevel={waterLevel} />
+                <View style={styles.row}>
+                    <View style={styles.statusRow}>
+                        <Text style={styles.text}>{'Online Status'}</Text>
+                        <Switch
+                            value={onlineStatus}
+                            onValueChange={() => {}}
+                            disabled={true}
+                            trackColor={{ false: Colors.offline, true: Colors.water }}
+                            thumbColor={onlineStatus ? Colors.waterLight : '#f4f3f4'}
+                        />
+                    </View>
+                    <View style={styles.statusRow}>
+                        <Text style={styles.text}>{'Motor Status'}</Text>
+                        <Switch
+                            value={motorStatus}
+                            onValueChange={() => {}}
+                            disabled={true}
+                            trackColor={{ false: Colors.offline, true: Colors.water }}
+                            thumbColor={motorStatus ? Colors.waterLight : '#f4f3f4'}
+                        />
+                    </View>
                 </View>
-                <View style={styles.statusRow}>
-                    <Text style={styles.text}>{'Motor Status'}</Text>
-                    <Switch
-                        value={motorStatus}
-                        onValueChange={() => {}}
-                        disabled={true}
-                        trackColor={{ false: '#767577', true: Colors.water }}
-                        thumbColor={motorStatus ? Colors.waterLight : '#f4f3f4'}
-                    />
+                <Text style={styles.text}>{`Distance between sensor and water surface: ${distance} cm`}</Text>
+                {motorStatus && (
+                    <View style={styles.timerSection}>
+                        <CircularTimer timer={motorTimer} />
+                        <Text style={styles.timerLabel}>{'Motor Timer'}</Text>
+                    </View>
+                )}
+            </View>
+            <View style={styles.footer}>
+                <View style={styles.noteContainer}>
+                    <Text style={styles.textBold}>{'Note:'}</Text>
+                    <View style={styles.noteItem}>
+                        <Text style={styles.text}>{'•'}</Text>
+                        <Text style={styles.text}>{'The motor turns ON when the water level goes below or equals 20%, runs for 20 minutes and then turns OFF.'}</Text>
+                    </View>
+                    <View style={styles.noteItem}>
+                        <Text style={styles.text}>{'•'}</Text>
+                        <Text style={styles.text}>{'The system remains OFF at night time between 11:00 PM and 5:00 AM local time.'}</Text>
+                    </View>
                 </View>
             </View>
-            <Text style={styles.text}>{`Distance between sensor and water surface: ${distance} cm`}</Text>
-            {motorStatus && (
-                <View style={styles.timerSection}>
-                    <CircularTimer timer={motorTimer} />
-                    <Text style={styles.timerLabel}>{'Motor Timer'}</Text>
-                </View>
-            )}
         </View>
     );
 };
