@@ -1,6 +1,7 @@
 const colors = {
     appBg: '#1f1f1f', // dark grey
-    offline: '#767577', // disable grey
+    offline: '#616161', // disable grey
+    sectionBg: '#2b2b2b', // light grey
     tankBorder: '#595959', // grey
     text: '#ffffff', // white
     textAboveWater: '#9fe1ff', // light blue

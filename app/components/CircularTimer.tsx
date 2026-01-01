@@ -14,7 +14,6 @@ const styles = StyleSheet.create({
     height: TIMER_SIZE,
     justifyContent: 'center',
     marginBottom: 8,
-    marginTop: 40,
     position: 'relative',
     width: TIMER_SIZE,
   },

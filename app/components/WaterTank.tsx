@@ -3,8 +3,8 @@ import React from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import Colors from '../colors';
 
-const TANK_WIDTH = 350;
-const TANK_HEIGHT = 225;
+const TANK_WIDTH = 275;
+const TANK_HEIGHT = 200;
 const TANK_BORDER_WIDTH = 3;
 const TANK_PADDING = 10;
 
