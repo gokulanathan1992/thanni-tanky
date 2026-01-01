@@ -13,20 +13,14 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.appBg,
         flex: 1,
         padding: 16,
+        paddingBottom: 36,
+        paddingTop: 36,
         width: '100%',
     },
     contentSection: {
         flex: 1,
         marginBottom: 8,
         marginTop: 8,
-        paddingBottom: 30,
-        width: '100%',
-    },
-    footerSection: {
-        marginBottom: 8,
-        marginTop: 8,
-        paddingBottom: 30,
-        position: 'sticky',
         width: '100%',
     },
     headerSection: {
